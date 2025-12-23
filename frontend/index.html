@@ -109,37 +109,38 @@
 
 <script>
 async function submitData() {
-    const email = document.getElementById("email").value;
-    const name  = document.getElementById("name").value;
-    const resultBox = document.getElementById("response");
+  const email = document.getElementById("email").value;
+  const name = document.getElementById("name").value;
+  const resultBox = document.getElementById("response");
 
-    if (!email || !name) {
-        resultBox.innerHTML = "❌ Please fill all fields";
-        resultBox.className = "error";
-        return;
-    }
+  resultBox.innerHTML = "⏳ Submitting...";
+  resultBox.className = "";
 
-    resultBox.innerHTML = "⏳ Submitting...";
-    resultBox.className = "";
+  try {
+    const res = await fetch("https://6jyc5q9r72.execute-api.us-east-1.amazonaws.com/prod", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, name })
+    });
 
-    try {
-        const res = await fetch("YOUR_API_GATEWAY_URL", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, name })
-        });
+    const text = await res.text();   // 👈 IMPORTANT
+    console.log("RAW RESPONSE:", text);
 
-        const data = await res.json();
+    const data = JSON.parse(text);
 
-        resultBox.innerHTML = "✅ " + data.message;
-        resultBox.className = "success";
+    resultBox.innerHTML = "✅ " + data.message;
+    resultBox.className = "success";
 
-    } catch (err) {
-        resultBox.innerHTML = "❌ Error submitting data";
-        resultBox.className = "error";
-    }
+  } catch (err) {
+    console.error("FETCH ERROR:", err);
+    resultBox.innerHTML = "❌ Error submitting data";
+    resultBox.className = "error";
+  }
 }
 </script>
+
 
 </body>
 </html>
